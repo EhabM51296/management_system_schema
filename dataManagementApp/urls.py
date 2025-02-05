@@ -1,5 +1,7 @@
 from django.urls import path
 from . import views
+from .views import import_csv
+
 
 urlpatterns = [
     path('schema/create', views.create_table, name='create_table'),
@@ -9,4 +11,5 @@ urlpatterns = [
     path('record/read', views.read_records, name='read_records'),
     path('data/update', views.update_record, name='update_record'),
     path('record/delete', views.delete_record, name='delete_record'),
+    path('record/import-csv', import_csv, name='import_csv'),
 ]

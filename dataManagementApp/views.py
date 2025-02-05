@@ -2,6 +2,7 @@ from django.http import JsonResponse
 from django.db import connection, transaction
 import json
 from dataManagementApp.models import SchemaData
+from dataManagementApp.tasks import process_csv_file
 from .utils import construct_Add_column_query, construct_alter_column_query, construct_create_table_query, construct_drop_column_query, create_field_definitions, save_schema_data
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -259,3 +260,25 @@ def delete_record(request):
 
     return JsonResponse({'error': 'Invalid request method'})
 
+# import file to insert data
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def import_csv(request):
+    if request.method == 'POST':
+        
+        table_name = request.POST.get('table_name')
+        csv_file = request.FILES.get('csv_file')
+        file_data = csv_file.read().decode('utf-8')
+
+        if not table_name or not csv_file:
+            return JsonResponse({'error': 'table_name and csv_file are required'})
+
+        try:
+            process_csv_file.delay(file_data, table_name)
+
+            return JsonResponse({'message': 'CSV import started successfully'})
+        except Exception as e:
+            return JsonResponse({'error': f'Error processing the CSV file: {str(e)}'})
+
+    return JsonResponse({'error': 'Invalid request method'})
