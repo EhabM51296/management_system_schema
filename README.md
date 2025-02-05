@@ -35,3 +35,84 @@
 # Challenegs faced
 1. **Valdating different scenarios when creating model or data**
 
+# apis with body examples:
+1. **http://127.0.0.1:8000/api/token/**
+{"username":"ehab", "password":"12345678Ehab96"}
+
+2. **http://127.0.0.1:8000/management/schema/create**
+**body: {
+    "table_name": "users",
+    "fields": {
+        "name": {
+            "type": "VARCHAR",
+            "length": 255,
+            "not_null": true
+        },
+        "email": {
+            "type": "VARCHAR",
+            "length": 255,
+            "not_null": true,
+            "unique": true
+        }
+    }
+}**
+
+3. **http://127.0.0.1:8000/management/schema/delete**
+{"table_name": "employees"}
+
+4. **http://127.0.0.1:8000/management/schema/update**
+{
+  "table_name": "users",
+  "delete_field": ["name"],
+   "new_field": {
+        "name": {
+            "type": "VARCHAR",
+            "length": 255,
+            "not_null": true
+        },
+        "email": {
+            "type": "VARCHAR",
+            "length": 255,
+            "not_null": true,
+            "unique": true
+        }
+    },
+     "update_field": {
+        "name": {
+            "type": "VARCHAR",
+            "length": 255,
+            "not_null": true
+        },
+        "email": {
+            "type": "VARCHAR",
+            "length": 255,
+            "not_null": true,
+            "unique": true
+        }
+    }
+}
+
+5. **http://127.0.0.1:8000/management/record/import-csv**
+form-data:
+{
+   csv-file: file.csv,
+   table_name: "users"
+}
+
+6. **http://127.0.0.1:8000/management/record/create**
+{"table_name": "Customer", "record_id": 1, "record_data": {"email": "new_email@example.com", "name": "test"}}
+
+7. **http://127.0.0.1:8000/management/record/delete**
+{"table_name": "Customer", "record_id": 1}
+
+8. **http://127.0.0.1:8000/management/record/update**
+{"table_name": "Customer", "record_id": 1, "update_data": {"email": "new_email@example.com"}}
+
+9. **http://127.0.0.1:8000/management/record/read?table_name=Customer&search=John&sort_by=name&sort_order=asc&page=1&page_size=10**
+
+10. **http://127.0.0.1:8000/api/token/**
+{"username":"ehab", "password":"12345678Ehab96"}
+
+**Note: for auth:
+Authorization: Bearer {token} // used for all apis in the headers
+**
