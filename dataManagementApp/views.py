@@ -242,15 +242,12 @@ def delete_record(request):
         table_name = data.get('table_name')
         record_id = data.get('record_id')
 
-        # Validate input
         if not table_name or not record_id:
             return JsonResponse({'error': 'table_name and record_id are required'})
 
-        # Check if the table exists
         if not SchemaData.objects.filter(table_name=table_name).exists():
             return JsonResponse({'error': f'Table {table_name} does not exist'})
 
-        # Delete record using raw SQL
         with connection.cursor() as cursor:
             try:
                 cursor.execute(f"DELETE FROM {table_name} WHERE id = {record_id};")
@@ -276,8 +273,8 @@ def import_csv(request):
 
         try:
             process_csv_file.delay(file_data, table_name)
-
             return JsonResponse({'message': 'CSV import started successfully'})
+        
         except Exception as e:
             return JsonResponse({'error': f'Error processing the CSV file: {str(e)}'})
 
