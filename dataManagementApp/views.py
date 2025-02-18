@@ -13,7 +13,6 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def create_table(request):
-    if request.method == 'POST':
         data = json.loads(request.body)
         table_name = data.get('table_name')
         fields = data.get('fields')
@@ -47,15 +46,11 @@ def create_table(request):
                 "error": f"An error occurred while creating the schema: {str(e)}"
             })
 
-    return JsonResponse({'error': 'Invalid request method'})
-
-
 # update schema of a table
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def update_table(request):
-    if request.method == 'POST':
         data = json.loads(request.body)
         table_name = data.get('table_name')
         new_field = data.get('new_field')  
@@ -67,21 +62,23 @@ def update_table(request):
 
         if not SchemaData.objects.filter(table_name=table_name).exists():
             return JsonResponse({'error': f'Table {table_name} does not exist'})
-
+        
         with connection.cursor() as cursor:
             try:
                 with transaction.atomic():
                     schema_metadata = SchemaData.objects.get(table_name=table_name)
                     old_fields = schema_metadata.fields
-
-
+                    if isinstance(old_fields, str):
+                        old_fields = json.loads(old_fields)
+                        
                     if new_field:
                         field_definitions = create_field_definitions(new_field)
                         alter_fields_query = construct_Add_column_query(table_name, field_definitions)
                         cursor.execute(alter_fields_query)
+
                         for field_name, add_field in new_field.items():
                             old_fields[field_name] = add_field
-
+                            
                     if update_field:
                         alter_fields_query = construct_alter_column_query(table_name, update_field)
                         cursor.execute(alter_fields_query)
@@ -102,15 +99,12 @@ def update_table(request):
             except Exception as e:
                 return JsonResponse({'error': str(e)})
 
-    return JsonResponse({'error': 'Invalid request method'})
-
 
 # delete a table
 @api_view(['DELETE'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def delete_table(request):
-    if request.method == 'DELETE':
         data = json.loads(request.body)
         table_name = data.get('table_name')
 
@@ -131,15 +125,12 @@ def delete_table(request):
             except Exception as e:
                 return JsonResponse({'error': str(e)})
 
-    return JsonResponse({'error': 'Invalid request method'})
-
 
 # data creation for a table
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def create_record(request):
-    if request.method == 'POST':
         data = json.loads(request.body)
         table_name = data.get('table_name')
         record_data = data.get('record_data')  
@@ -159,14 +150,11 @@ def create_record(request):
             except Exception as e:
                 return JsonResponse({'error': str(e)})
 
-    return JsonResponse({'error': 'Invalid request method'})
-
 # get data
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def read_records(request):
-    if request.method == 'GET':
         table_name = request.GET.get('table_name')
         search_query = request.GET.get('search', '')
         sort_by = request.GET.get('sort_by', 'id')
@@ -203,14 +191,11 @@ def read_records(request):
             except Exception as e:
                 return JsonResponse({'error': str(e)})
 
-    return JsonResponse({'error': 'Invalid request method'})
-
 # update data
 @api_view(['PUT'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def update_record(request):
-    if request.method == 'PUT':
         data = json.loads(request.body)
         table_name = data.get('table_name')
         record_id = data.get('record_id')
@@ -230,14 +215,11 @@ def update_record(request):
             except Exception as e:
                 return JsonResponse({'error': str(e)})
 
-    return JsonResponse({'error': 'Invalid request method'})
-
 # delete data
 @api_view(['DELETE'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def delete_record(request):
-    if request.method == 'DELETE':
         data = json.loads(request.body)
         table_name = data.get('table_name')
         record_id = data.get('record_id')
@@ -255,15 +237,11 @@ def delete_record(request):
             except Exception as e:
                 return JsonResponse({'error': str(e)})
 
-    return JsonResponse({'error': 'Invalid request method'})
-
 # import file to insert data
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def import_csv(request):
-    if request.method == 'POST':
-        
         table_name = request.POST.get('table_name')
         csv_file = request.FILES.get('csv_file')
         file_data = csv_file.read().decode('utf-8')
@@ -277,5 +255,3 @@ def import_csv(request):
         
         except Exception as e:
             return JsonResponse({'error': f'Error processing the CSV file: {str(e)}'})
-
-    return JsonResponse({'error': 'Invalid request method'})

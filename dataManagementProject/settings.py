@@ -11,8 +11,6 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-from .celery import app as celery_app
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -25,8 +23,6 @@ SECRET_KEY = 'django-insecure-7h_-zj)(u!*@+ri7m7-*$)d#2(wa_lhln+2^h-0b0_70dx)w_^
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
-__all__ = ('celery_app',)
 
 ALLOWED_HOSTS = []
 
@@ -42,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
+    # dataManagementApp.apps.DatamanagementappConfig
     'dataManagementApp'
 ]
 
